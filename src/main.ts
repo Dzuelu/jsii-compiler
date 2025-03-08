@@ -8,14 +8,13 @@ import * as yargs from 'yargs';
 
 import { Compiler } from './compiler';
 import { configureCategories } from './jsii-diagnostic';
+import { JsiiError } from './jsii-error';
 import { loadProjectInfo } from './project-info';
 import { emitSupportPolicyInformation } from './support';
 import { TypeScriptConfigValidationRuleSet } from './tsconfig';
 import * as utils from './utils';
 import { VERSION } from './version';
-import { enabledWarnings } from './warnings';
-
-const warningTypes = Object.keys(enabledWarnings);
+import { enabledWarnings, silenceWarnings } from './warnings';
 
 function choiceWithDesc(
   choices: { [choice: string]: string },
@@ -91,7 +90,7 @@ const ruleSets: {
             group: OPTION_GROUP.JSII,
             type: 'array',
             default: [],
-            desc: `List of warnings to silence (warnings: ${warningTypes.join(',')})`,
+            desc: `List of warnings to silence (warnings: ${Object.keys(enabledWarnings).join(',')})`,
           })
           .option('strip-deprecated', {
             group: OPTION_GROUP.JSII,
@@ -142,7 +141,7 @@ const ruleSets: {
           _configureLog4js(argv.verbose);
 
           if (argv['generate-tsconfig'] != null && argv.tsconfig != null) {
-            throw new utils.JsiiError('Options --generate-tsconfig and --tsconfig are mutually exclusive', true);
+            throw new JsiiError('Options --generate-tsconfig and --tsconfig are mutually exclusive', true);
           }
 
           const projectRoot = path.normalize(path.resolve(process.cwd(), argv.PROJECT_ROOT));
@@ -150,15 +149,7 @@ const ruleSets: {
           const { projectInfo, diagnostics: projectInfoDiagnostics } = loadProjectInfo(projectRoot);
 
           // disable all silenced warnings
-          for (const key of argv['silence-warnings']) {
-            if (!(key in enabledWarnings)) {
-              throw new utils.JsiiError(
-                `Unknown warning type ${key as any}. Must be one of: ${warningTypes.join(', ')}`,
-              );
-            }
-
-            enabledWarnings[key] = false;
-          }
+          silenceWarnings(argv['silence-warnings'] as string[]);
 
           configureCategories(projectInfo.diagnostics ?? {});
 
@@ -192,7 +183,7 @@ const ruleSets: {
             process.exitCode = 1;
           }
         } catch (e: unknown) {
-          if (e instanceof utils.JsiiError) {
+          if (e instanceof JsiiError) {
             if (e.showHelp) {
               console.log();
               yargs.showHelp();

@@ -15,6 +15,7 @@ import { getReferencedDocParams, parseSymbolDocumentation, TypeSystemHints } fro
 import { Emitter } from './emitter';
 import { normalizeConfigPath } from './helpers';
 import { JsiiDiagnostic } from './jsii-diagnostic';
+import { JsiiError } from './jsii-error';
 import * as literate from './literate';
 import * as bindings from './node-bindings';
 import { ProjectInfo } from './project-info';
@@ -23,10 +24,8 @@ import { DeprecatedRemover } from './transforms/deprecated-remover';
 import { DeprecationWarningsInjector } from './transforms/deprecation-warnings';
 import { RuntimeTypeInfoInjector } from './transforms/runtime-info';
 import { combinedTransformers } from './transforms/utils';
-import { JsiiError } from './utils';
 import { Validator } from './validator';
 import { SHORT_VERSION, VERSION } from './version';
-import { enabledWarnings } from './warnings';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const sortJson = require('sort-json');
@@ -1952,10 +1951,6 @@ export class Assembler implements Emitter {
   }
 
   private _warnAboutReservedWords(symbol: ts.Symbol) {
-    if (!enabledWarnings['reserved-word']) {
-      return;
-    }
-
     const reservingLanguages = isReservedName(symbol.name);
     if (reservingLanguages) {
       this._diagnostics.push(

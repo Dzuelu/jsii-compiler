@@ -21,8 +21,8 @@ import {
 import * as ts from 'typescript';
 
 import { JsiiDiagnostic } from '../jsii-diagnostic';
+import { JsiiError } from '../jsii-error';
 import * as bindings from '../node-bindings';
-import { JsiiError } from '../utils';
 
 export class DeprecatedRemover {
   private readonly transformations = new Array<Transformation>();

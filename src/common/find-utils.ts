@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { JsiiError } from '../utils';
+import { JsiiError } from '../jsii-error';
 
 /**
  * Find a directory up the tree from a starting directory matching a condition

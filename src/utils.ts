@@ -1,7 +1,9 @@
 import * as log4js from 'log4js';
 import * as ts from 'typescript';
 
-import { JsiiDiagnostic } from './jsii-diagnostic';
+import { Code, JsiiDiagnostic } from './jsii-diagnostic';
+import { JsiiError } from './jsii-error';
+import { enabledWarnings } from './warnings';
 
 /**
  * Name of the logger for cli errors
@@ -36,6 +38,10 @@ export function diagnosticsLogger(
       return logger.error.bind(logger);
     case ts.DiagnosticCategory.Warning:
       if (!logger.isWarnEnabled()) {
+        return undefined;
+      }
+      const t = Code.lookup(diagnostic.code);
+      if (t?.name && enabledWarnings[t.name] === false) {
         return undefined;
       }
       return logger.warn.bind(logger);
@@ -167,20 +173,3 @@ export function stripAnsi(x: string): string {
  * Maps the provided type to stip all `readonly` modifiers from its properties.
  */
 export type Mutable<T> = { -readonly [K in keyof T]: Mutable<T[K]> };
-
-/**
- * Throws an error that is intended as CLI output.
- */
-export class JsiiError extends Error {
-  /**
-   * An expected error that can be nicely formatted where needed (e.g. in CLI output)
-   * This should only be used for errors that a user can fix themselves.
-   *
-   * @param message The error message to be printed to the user.
-   * @param showHelp Print the help before the error.
-   */
-  constructor(public override readonly message: string, public readonly showHelp = false) {
-    super(message);
-    Object.setPrototypeOf(this, JsiiError.prototype);
-  }
-}

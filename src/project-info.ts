@@ -8,8 +8,9 @@ import * as ts from 'typescript';
 
 import { findDependencyDirectory } from './common/find-utils';
 import { JsiiDiagnostic } from './jsii-diagnostic';
+import { JsiiError } from './jsii-error';
 import { TypeScriptConfigValidationRuleSet } from './tsconfig';
-import { JsiiError, parsePerson, parseRepository } from './utils';
+import { parsePerson, parseRepository } from './utils';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const spdx: Set<string> = require('spdx-license-list/simple');

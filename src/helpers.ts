@@ -14,8 +14,9 @@ import * as spec from '@jsii/spec';
 import { DiagnosticCategory } from 'typescript';
 
 import { Compiler, CompilerOptions } from './compiler';
+import { JsiiError } from './jsii-error';
 import { loadProjectInfo, ProjectInfo } from './project-info';
-import { formatDiagnostic, JsiiError } from './utils';
+import { formatDiagnostic } from './utils';
 
 /**
  * A set of source files for `sourceToAssemblyHelper`, at least containing 'index.ts'
